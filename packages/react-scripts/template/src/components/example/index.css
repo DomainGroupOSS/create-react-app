@@ -1,0 +1,59 @@
+.wrapper {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+
+  &.isTwoColumn {
+    flex-direction: row;
+  }
+}
+
+.shared {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  composes: shared;
+}
+
+.heading {
+  composes: shared;
+  font-size: 30px;
+  background-color: rgb(14, 168, 0);
+  color: white;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.appLogo {
+  animation: spin infinite 20s linear;
+  height: 80px;
+}
+
+
+.subHeading {
+  font-size: 20px;
+  margin: 30px 0;
+}
+
+.code {
+  font-family: monospace;
+}
+
+.todo {
+  list-style: circle inside;
+  margin-left: 1em;
+}
+
+.link {
+  color: blue;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
