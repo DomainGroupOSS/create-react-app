@@ -1,6 +1,7 @@
 {
   "name": "domain-react-scripts",
-  "version": "0.1.0",
+  "author": "Albert Still <albert.still@domain.com.au>",
+  "version": "0.0.0",
   "description": "Configuration and scripts for Domain React components",
   "repository": "DomainGroupOSS/create-react-app",
   "license": "MIT",

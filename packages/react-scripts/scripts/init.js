@@ -38,7 +38,7 @@ module.exports = function(
   // Setup the script rules
   appPackage.scripts = {
     start: 'domain-react-scripts start',
-    build: 'domain-react-scripts build',
+    // build: 'domain-react-scripts build',
     test: 'domain-react-scripts test --env=jsdom',
   };
 
@@ -127,6 +127,22 @@ module.exports = function(
       console.error(`\`${command} ${args.join(' ')}\` failed`);
       return;
     }
+  }
+
+  let devDepArgs;
+  if (useYarn) {
+    devDepArgs = ['add', '--dev'];
+  } else {
+    devDepArgs = ['install', '--save-dev', verbose && '--verbose'].filter(
+      e => e
+    );
+  }
+  devDepArgs.push('@domain-group/fe-co-demo');
+
+  const proc = spawn.sync(command, devDepArgs, { stdio: 'inherit' });
+  if (proc.status !== 0) {
+    console.error(`\`${command} ${devDepArgs.join(' ')}\` failed`);
+    return;
   }
 
   // Display the most elegant way to cd.

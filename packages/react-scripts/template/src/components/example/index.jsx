@@ -4,7 +4,10 @@ import logo from './logo.svg';
 
 export default function Example({ isTwoColumn }) {
   return (
-    <section className={`${styles.wrapper}${isTwoColumn ? 'isTwoColumn' : ''}`}>
+    <section
+      className={`${styles.wrapper}${isTwoColumn
+        ? ` ${styles.isTwoColumn}`
+        : ''}`}>
       <h1 className={styles.heading}>
         <code className={styles.code}>fe-co-foobar</code>
       </h1>
@@ -15,15 +18,19 @@ export default function Example({ isTwoColumn }) {
           <li>Toggle the different fixtures on the left</li>
           <li>
             Edit and rename this example component:{' '}
-            <code className={styles.code}>src/components/example/index.jsx</code>
+            <code className={styles.code}>
+              src/components/example/index.jsx
+            </code>
           </li>
           <li>
             Edit the styles:{' '}
-            <code className={styles.code}>src/components/example/index.css</code>
+            <code className={styles.code}>
+              src/components/example/index.css
+            </code>
           </li>
           <li>
             Edit the demo fixtures:{' '}
-            <code className={styles.code}>demo/fixtures/index.js</code>
+            <code className={styles.code}>demo/fixtures.js</code>
           </li>
           <li>Get a coffee from Stockroom Cafe</li>
         </ul>
