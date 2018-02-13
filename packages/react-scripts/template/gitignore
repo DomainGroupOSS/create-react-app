@@ -21,4 +21,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # Domain legacy Sass
-src/legacy.css
+/src/legacy.css

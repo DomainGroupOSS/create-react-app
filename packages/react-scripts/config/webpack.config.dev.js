@@ -8,7 +8,6 @@
 // @remove-on-eject-end
 'use strict';
 
-const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -29,6 +28,29 @@ const publicPath = '/';
 const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
+
+const postCSSLoaderOptions = {
+  ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+  plugins: loader => [
+    require('postcss-flexbugs-fixes'),
+    require('postcss-import')({ root: loader.resourcePath }),
+    require('postcss-cssnext')({
+      // postcss-cssnext passes `browsers` to multiple features, including autoprefixer
+      // https://github.com/MoOx/postcss-cssnext/blob/3.1.0/src/index.js#L29-L33
+      browsers: [
+        '>1%',
+        'last 4 versions',
+        'Firefox ESR',
+        'not ie < 9', // React doesn't support IE8 anyway
+      ],
+      feature: {
+        autoprefixer: {
+          flexbox: 'no-2009',
+        },
+      },
+    }),
+  ],
+};
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -182,7 +204,7 @@ module.exports = {
           // In production, we use a plugin to extract that CSS to a file, but
           // in development "style" loader enables hot editing of CSS.
           {
-            test: /\.css$/,
+            test: /legacy\.css$/,
             use: [
               require.resolve('style-loader'),
               {
@@ -193,23 +215,25 @@ module.exports = {
               },
               {
                 loader: require.resolve('postcss-loader'),
+                options: postCSSLoaderOptions,
+              },
+            ],
+          },
+          {
+            test: /\.css$/,
+            use: [
+              require.resolve('style-loader'),
+              {
+                loader: require.resolve('css-loader'),
                 options: {
-                  // Necessary for external CSS imports to work
-                  // https://github.com/facebookincubator/create-react-app/issues/2677
-                  ident: 'postcss',
-                  plugins: () => [
-                    require('postcss-flexbugs-fixes'),
-                    autoprefixer({
-                      browsers: [
-                        '>1%',
-                        'last 4 versions',
-                        'Firefox ESR',
-                        'not ie < 9', // React doesn't support IE8 anyway
-                      ],
-                      flexbox: 'no-2009',
-                    }),
-                  ],
+                  importLoaders: 1,
+                  modules: true,
+                  localIdentName: '[path]__[name]___[local]',
                 },
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: postCSSLoaderOptions,
               },
             ],
           },

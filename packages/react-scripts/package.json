@@ -1,6 +1,6 @@
 {
   "name": "domain-react-scripts",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Configuration and scripts for Domain React components",
   "repository": "DomainGroupOSS/create-react-app",
   "license": "MIT",
@@ -47,7 +47,9 @@
     "jest": "20.0.4",
     "node-sass": "^4.7.2",
     "object-assign": "4.1.1",
+    "postcss-cssnext": "^3.1.0",
     "postcss-flexbugs-fixes": "3.2.0",
+    "postcss-import": "^11.1.0",
     "postcss-loader": "2.0.8",
     "promise": "8.0.1",
     "raf": "3.4.0",
