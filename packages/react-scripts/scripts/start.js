@@ -23,6 +23,7 @@ process.on('unhandledRejection', err => {
 require('../config/env');
 
 const fs = require('fs');
+const path = require('path');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -35,6 +36,7 @@ const {
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
+const sass = require('node-sass');
 const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
@@ -64,6 +66,27 @@ if (process.env.HOST) {
   );
   console.log(`Learn more here: ${chalk.yellow('http://bit.ly/2mwWSwH')}`);
   console.log();
+}
+
+const legacyInputSassPath = path.join(paths.appPath, 'src', 'legacy.scss');
+const legacyOutputCssPath = path.join(paths.appSrc, 'legacy.css');
+if (fs.existsSync(legacyInputSassPath)) {
+  console.log(
+    chalk.cyan(
+      'Detected `src/legacy.scss`, attempting to compile to `src/legacy.css` using node-sass.'
+    )
+  );
+
+  const { css } = sass.renderSync({
+    file: legacyInputSassPath,
+    includePaths: [paths.appNodeModules],
+  });
+
+  fs.writeFileSync(legacyOutputCssPath, css);
+
+  console.log(
+    chalk.cyan('Successfully wrote compiled Sass to `src/legacy.css`')
+  );
 }
 
 // We attempt to use the default port but if it is busy, we offer the user to
