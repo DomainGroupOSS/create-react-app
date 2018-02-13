@@ -1,14 +1,14 @@
 {
-  "name": "react-scripts",
-  "version": "1.1.1",
-  "description": "Configuration and scripts for Create React App.",
-  "repository": "facebookincubator/create-react-app",
+  "name": "domain-react-scripts",
+  "version": "0.0.1",
+  "description": "Configuration and scripts for Domain React components",
+  "repository": "DomainGroupOSS/create-react-app",
   "license": "MIT",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/facebookincubator/create-react-app/issues"
+    "url": "https://github.com/DomainGroupOSS/create-react-app/issues"
   },
   "files": [
     "bin",
@@ -45,6 +45,7 @@
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
     "jest": "20.0.4",
+    "node-sass": "^4.7.2",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
