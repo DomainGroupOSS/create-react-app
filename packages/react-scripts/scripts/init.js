@@ -38,7 +38,7 @@ module.exports = function(
   // Setup the script rules
   appPackage.scripts = {
     start: 'domain-react-scripts start',
-    // build: 'domain-react-scripts build',
+    build: 'domain-react-scripts build',
     test: 'domain-react-scripts test --env=jsdom',
   };
 
