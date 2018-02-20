@@ -23,7 +23,6 @@ process.on('unhandledRejection', err => {
 require('../config/env');
 
 const fs = require('fs');
-const path = require('path');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -36,10 +35,10 @@ const {
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
-const sass = require('node-sass');
 const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
+const buildLegacySass = require('./build-legacy-sass');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
@@ -68,47 +67,7 @@ if (process.env.HOST) {
   console.log();
 }
 
-const legacySrcInputSassPath = path.join(paths.appSrc, 'legacy.scss');
-const legacySrcOutputCssPath = path.join(paths.appSrc, 'legacy.css');
-if (fs.existsSync(legacySrcInputSassPath)) {
-  console.log(
-    chalk.cyan(
-      'Detected `src/legacy.scss`, attempting to compile to `src/legacy.css` using node-sass.'
-    )
-  );
-
-  const { css } = sass.renderSync({
-    file: legacySrcInputSassPath,
-    includePaths: [paths.appNodeModules],
-  });
-
-  fs.writeFileSync(legacySrcOutputCssPath, css);
-
-  console.log(
-    chalk.cyan('Successfully wrote compiled Sass to `src/legacy.css`')
-  );
-}
-
-const legacyDemoInputSassPath = path.join(paths.appDemo, 'legacy.scss');
-const legacyDemoOutputCssPath = path.join(paths.appDemo, 'legacy.css');
-if (fs.existsSync(legacyDemoInputSassPath)) {
-  console.log(
-    chalk.cyan(
-      'Detected `demo/legacy.scss`, attempting to compile to `demo/legacy.css` using node-sass.'
-    )
-  );
-
-  const { css } = sass.renderSync({
-    file: legacyDemoInputSassPath,
-    includePaths: [paths.appNodeModules],
-  });
-
-  fs.writeFileSync(legacyDemoOutputCssPath, css);
-
-  console.log(
-    chalk.cyan('Successfully wrote compiled Sass to `demo/legacy.css`')
-  );
-}
+buildLegacySass();
 
 // We attempt to use the default port but if it is busy, we offer the user to
 // run on a different port. `choosePort()` Promise resolves to the next free port.
