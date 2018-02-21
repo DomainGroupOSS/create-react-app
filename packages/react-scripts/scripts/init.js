@@ -43,8 +43,9 @@ module.exports = function(
     test: 'domain-react-scripts test --env=jsdom',
   };
 
-  // so the result of domain-react-scripts build:library can be required
+  // so the js/css of domain-react-scripts build:library can be required
   appPackage.main = 'lib';
+  appPackage.style = 'lib';
 
   fs.writeFileSync(
     path.join(appPath, 'package.json'),
