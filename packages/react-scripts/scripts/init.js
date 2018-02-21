@@ -90,16 +90,18 @@ module.exports = function(
   );
 
   let command;
-  let depArgs;
+  let peerDepArgs;
 
   if (useYarn) {
     command = 'yarnpkg';
-    depArgs = ['add'];
+    peerDepArgs = ['add', '--save-dev'];
   } else {
     command = 'npm';
-    depArgs = ['install', '--save', verbose && '--verbose'].filter(e => e);
+    peerDepArgs = ['install', '--save-dev', verbose && '--verbose'].filter(
+      e => e
+    );
   }
-  depArgs.push('react', 'react-dom');
+  peerDepArgs.push('react', 'react-dom');
 
   // Install additional template dependencies, if present
   const templateDependenciesPath = path.join(
@@ -108,7 +110,7 @@ module.exports = function(
   );
   if (fs.existsSync(templateDependenciesPath)) {
     const templateDependencies = require(templateDependenciesPath).dependencies;
-    depArgs = depArgs.concat(
+    peerDepArgs = peerDepArgs.concat(
       Object.keys(templateDependencies).map(key => {
         return `${key}@${templateDependencies[key]}`;
       })
@@ -123,9 +125,9 @@ module.exports = function(
     console.log(`Installing react and react-dom using ${command}...`);
     console.log();
 
-    const proc = spawn.sync(command, depArgs, { stdio: 'inherit' });
+    const proc = spawn.sync(command, peerDepArgs, { stdio: 'inherit' });
     if (proc.status !== 0) {
-      console.error(`\`${command} ${depArgs.join(' ')}\` failed`);
+      console.error(`\`${command} ${peerDepArgs.join(' ')}\` failed`);
       return;
     }
   }
