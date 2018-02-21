@@ -50,6 +50,7 @@ function getServedPath(appPackageJson) {
 module.exports = {
   dotenv: resolveApp('.env'),
   appBuild: resolveApp('build'),
+  appLib: resolveApp('lib'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('demo/index.html'),
   appIndexJs: resolveApp('src/index.jsx'),
@@ -72,6 +73,7 @@ module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
   appBuild: resolveApp('build'),
+  appLib: resolveApp('lib'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('demo/index.html'),
   appIndexJs: resolveApp('src/index.jsx'),
@@ -104,6 +106,7 @@ if (
     dotenv: resolveOwn('template/.env'),
     appPath: resolveApp('.'),
     appBuild: resolveOwn('../../build'),
+    appLib: resolveOwn('../../lib'),
     appPublic: resolveOwn('template/public'),
     appHtml: resolveOwn('template/demo/index.html'),
     appIndexJs: resolveOwn('template/src/index.jsx'),
