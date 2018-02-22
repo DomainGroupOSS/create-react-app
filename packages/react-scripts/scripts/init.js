@@ -145,6 +145,7 @@ module.exports = function(
     );
   }
   devDepArgs.push('@domain-group/fe-co-demo');
+  devDepArgs.push('@domain-group/fe-brary');
 
   const proc = spawn.sync(command, devDepArgs, { stdio: 'inherit' });
   if (proc.status !== 0) {

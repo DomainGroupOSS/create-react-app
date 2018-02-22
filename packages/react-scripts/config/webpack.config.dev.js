@@ -16,6 +16,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const feBrary = require('@domain-group/fe-brary');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -28,6 +29,22 @@ const publicPath = '/';
 const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
+
+const themeVar = process.env.FE_BRARY_THEME || 'domain';
+const theme = feBrary.themeVariables[themeVar];
+
+if (!theme) {
+  throw new Error(
+    `Unrecognised \`FE_BRARY_THEME\` env var \`${process.env
+      .FE_BRARY_THEME}\` - must be one of ${JSON.stringify(feBrary.themes)}`
+  );
+}
+
+const postcssCustomPropertiesVariables = Object.values(
+  theme
+).reduce((acc, cssVars) => {
+  return Object.assign(acc, cssVars);
+}, {});
 
 const postCSSLoaderOptions = {
   ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
@@ -46,6 +63,9 @@ const postCSSLoaderOptions = {
       features: {
         autoprefixer: {
           flexbox: 'no-2009',
+        },
+        customProperties: {
+          variables: postcssCustomPropertiesVariables,
         },
       },
     }),

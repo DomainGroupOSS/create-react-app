@@ -9,7 +9,7 @@ export default function Example({ isTwoColumn }) {
         ? ` ${styles.isTwoColumn}`
         : ''}`}>
       <h1 className={styles.heading}>
-        <code className={styles.code}>fe-co-foobar</code>
+        fe-co-foobar
       </h1>
       <div className={styles.content}>
         <img src={logo} className={styles.appLogo} alt="logo" />
