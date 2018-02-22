@@ -67,7 +67,7 @@ const postCSSLoaderOptions = {
         'Firefox ESR',
         'not ie < 9', // React doesn't support IE8 anyway
       ],
-      feature: {
+      features: {
         autoprefixer: {
           flexbox: 'no-2009',
         },
