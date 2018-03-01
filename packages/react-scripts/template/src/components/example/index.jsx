@@ -32,7 +32,17 @@ export default function Example({ isTwoColumn }) {
             Edit the demo fixtures:{' '}
             <code className={styles.code}>demo/fixtures.js</code>
           </li>
-          <li>Get a coffee from Stockroom Cafe</li>
+          <li>
+            Get a coffee from{' '}
+            <a
+              className={styles.stockroomCafeLink}
+              href="http://stockroompyrmont.com.au/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Stockroom Cafe
+            </a>
+          </li>
         </ul>
       </div>
     </section>

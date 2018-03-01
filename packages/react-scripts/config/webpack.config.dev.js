@@ -43,8 +43,36 @@ if (!theme) {
 const postcssCustomPropertiesVariables = Object.values(
   theme
 ).reduce((acc, cssVars) => {
-  return Object.assign(acc, cssVars);
+  Object.entries(cssVars).forEach(([key, value]) => {
+    // camelCase to kebab-case
+    acc[key.replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase()] = value;
+  });
+  return acc;
 }, {});
+
+const postcssApplyRuleSets = {
+  'font-h1': `
+    font-size: var(--h1-mobile-font-size);
+    line-height: var(--h1-mobile-line-height);
+
+    @media (min-width: var(--tablet-min-width)) {
+      font-size: var(--h1-font-size);
+      line-height: var(--h1-line-height);
+    }
+  `,
+  'a-normalize': `
+    color: inherit;
+    text-decoration: inherit;
+
+    &:hover,
+    &:focus,
+    &:visited,
+    &:active {
+      color: inherit;
+      text-decoration: inherit;
+    }
+  `,
+};
 
 const postCSSLoaderOptions = {
   ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
@@ -66,6 +94,9 @@ const postCSSLoaderOptions = {
         },
         customProperties: {
           variables: postcssCustomPropertiesVariables,
+        },
+        applyRule: {
+          sets: postcssApplyRuleSets,
         },
       },
     }),

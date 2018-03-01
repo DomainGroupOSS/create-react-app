@@ -22,8 +22,8 @@
 
 .heading {
   composes: shared;
-  font-size: 30px;
-  background-color: var(--brandGreen);
+  @apply --font-h1;
+  background-color: var(--brand-green);
   color: var(--white);
   text-align: center;
   flex-grow: 1;
@@ -51,6 +51,11 @@
 
 .link {
   color: blue;
+}
+
+.stockroomCafeLink {
+  @apply --a-normalize;
+  text-decoration: underline;
 }
 
 @keyframes spin {
