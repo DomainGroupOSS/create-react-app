@@ -55,7 +55,7 @@ const postcssApplyRuleSets = {
     font-size: var(--h1-mobile-font-size);
     line-height: var(--h1-mobile-line-height);
 
-    @media (min-width: var(--tablet-min-width)) {
+    @media (--tablet-min-width) {
       font-size: var(--h1-font-size);
       line-height: var(--h1-line-height);
     }
@@ -72,6 +72,11 @@ const postcssApplyRuleSets = {
       text-decoration: inherit;
     }
   `,
+};
+
+const postcssCustomMediaExtensions = {
+  // var(--tablet-min-width) did not work
+  '--tablet-min-width': `(min-width: ${theme.global.tabletMinWidth})`,
 };
 
 const postCSSLoaderOptions = {
@@ -97,6 +102,9 @@ const postCSSLoaderOptions = {
         },
         applyRule: {
           sets: postcssApplyRuleSets,
+        },
+        customMedia: {
+          extensions: postcssCustomMediaExtensions,
         },
       },
     }),
