@@ -17,6 +17,7 @@ const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeM
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const feBrary = require('@domain-group/fe-brary');
+const generateCssConfig = require('./css');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -30,8 +31,7 @@ const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
 
-const themeVar = process.env.FE_BRARY_THEME || 'domain';
-const theme = feBrary.themeVariables[themeVar];
+const theme = process.env.FE_BRARY_THEME || 'domain';
 
 if (!theme) {
   throw new Error(
@@ -39,77 +39,6 @@ if (!theme) {
       .FE_BRARY_THEME}\` - must be one of ${JSON.stringify(feBrary.themes)}`
   );
 }
-
-const postcssCustomPropertiesVariables = Object.values(
-  theme
-).reduce((acc, cssVars) => {
-  Object.entries(cssVars).forEach(([key, value]) => {
-    // camelCase to kebab-case
-    acc[key.replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase()] = value;
-  });
-  return acc;
-}, {});
-
-const postcssApplyRuleSets = {
-  'font-h1': `
-    font-size: var(--h1-mobile-font-size);
-    line-height: var(--h1-mobile-line-height);
-
-    @media (--tablet-min-width) {
-      font-size: var(--h1-font-size);
-      line-height: var(--h1-line-height);
-    }
-  `,
-  'a-normalize': `
-    color: inherit;
-    text-decoration: inherit;
-
-    &:hover,
-    &:focus,
-    &:visited,
-    &:active {
-      color: inherit;
-      text-decoration: inherit;
-    }
-  `,
-};
-
-const postcssCustomMediaExtensions = {
-  // var(--tablet-min-width) did not work
-  '--tablet-min-width': `(min-width: ${theme.global.tabletMinWidth})`,
-};
-
-const postCSSLoaderOptions = {
-  ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
-  plugins: loader => [
-    require('postcss-flexbugs-fixes'),
-    require('postcss-import')({ root: loader.resourcePath }),
-    require('postcss-cssnext')({
-      // postcss-cssnext passes `browsers` to multiple features, including autoprefixer
-      // https://github.com/MoOx/postcss-cssnext/blob/3.1.0/src/index.js#L29-L33
-      browsers: [
-        '>1%',
-        'last 4 versions',
-        'Firefox ESR',
-        'not ie < 9', // React doesn't support IE8 anyway
-      ],
-      features: {
-        autoprefixer: {
-          flexbox: 'no-2009',
-        },
-        customProperties: {
-          variables: postcssCustomPropertiesVariables,
-        },
-        applyRule: {
-          sets: postcssApplyRuleSets,
-        },
-        customMedia: {
-          extensions: postcssCustomMediaExtensions,
-        },
-      },
-    }),
-  ],
-};
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -274,7 +203,7 @@ module.exports = {
               },
               {
                 loader: require.resolve('postcss-loader'),
-                options: postCSSLoaderOptions,
+                options: generateCssConfig(theme),
               },
             ],
           },
@@ -292,7 +221,7 @@ module.exports = {
               },
               {
                 loader: require.resolve('postcss-loader'),
-                options: postCSSLoaderOptions,
+                options: generateCssConfig(theme),
               },
             ],
           },
