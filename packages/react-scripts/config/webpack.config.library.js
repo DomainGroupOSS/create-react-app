@@ -14,15 +14,15 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const nodeExternals = require('webpack-node-externals');
-const feBrary = require('@domain-group/fe-brary');
-const generateCssConfig = require('./css');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
 const publicPath = paths.servedPath;
-
+// Some apps do not use client-side routing with pushState.
+// For these, "homepage" can be set to "." to enable relative asset paths.
+const shouldUseRelativeAssetPaths = publicPath === './';
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
@@ -36,14 +36,40 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
   throw new Error('Production builds must have NODE_ENV=production.');
 }
 
-const cssThemeExtracts = feBrary.themes.map(theme => {
-  // Note: defined here because it will be used more than once.
-  const filename = `${theme}.css`;
+// Note: defined here because it will be used more than once.
+const cssFilename = 'styles.css';
 
-  return new ExtractTextPlugin({
-    filename,
-  });
-});
+// ExtractTextPlugin expects the build output to be flat.
+// (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
+// However, our output is structured with css, js and media folders.
+// To have this structure working with relative paths, we have to use custom options.
+const extractTextPluginOptions = shouldUseRelativeAssetPaths
+  ? // Making sure that the publicPath goes back to to build folder.
+    { publicPath: Array(cssFilename.split('/').length).join('../') }
+  : {};
+
+const postCSSLoaderOptions = {
+  ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+  plugins: loader => [
+    require('postcss-flexbugs-fixes'),
+    require('postcss-import')({ root: loader.resourcePath }),
+    require('postcss-cssnext')({
+      // postcss-cssnext passes `browsers` to multiple features, including autoprefixer
+      // https://github.com/MoOx/postcss-cssnext/blob/3.1.0/src/index.js#L29-L33
+      browsers: [
+        '>1%',
+        'last 4 versions',
+        'Firefox ESR',
+        'not ie < 9', // React doesn't support IE8 anyway
+      ],
+      features: {
+        autoprefixer: {
+          flexbox: 'no-2009',
+        },
+      },
+    }),
+  ],
+};
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
@@ -144,65 +170,6 @@ module.exports = {
         ],
         include: paths.appSrc,
       },
-      ...cssThemeExtracts.reduce(
-        (accumulator, themeExtractTextPlugin, index) => {
-          return accumulator.concat(
-            // The notation here is somewhat confusing.
-            // "postcss" loader applies autoprefixer to our CSS.
-            // "css" loader resolves paths in CSS and adds assets as dependencies.
-            // "style" loader normally turns CSS into JS modules injecting <style>,
-            // but unlike in development configuration, we do something different.
-            // `ExtractTextPlugin` first applies the "postcss" and "css" loaders
-            // (second argument), then grabs the result CSS and puts it into a
-            // separate file in our build process. This way we actually ship
-            // a single CSS file in production instead of JS code injecting <style>
-            // tags. If you use code splitting, however, any async bundles will still
-            // use the "style" loader inside the async code so CSS from them won't be
-            // in the main CSS file.
-            {
-              test: /legacy\.css$/,
-              loader: themeExtractTextPlugin.extract({
-                use: [
-                  {
-                    loader: require.resolve('css-loader'),
-                    options: {
-                      importLoaders: 1,
-                      minimize: true,
-                    },
-                  },
-                  {
-                    loader: require.resolve('postcss-loader'),
-                    options: generateCssConfig(feBrary.themes[index]),
-                  },
-                ],
-              }),
-              // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
-            },
-            {
-              test: /\.css$/,
-              loader: themeExtractTextPlugin.extract({
-                use: [
-                  {
-                    loader: require.resolve('css-loader'),
-                    options: {
-                      minimize: true,
-                      importLoaders: 1,
-                      modules: true,
-                      localIdentName: '_[hash:base64:4]',
-                    },
-                  },
-                  {
-                    loader: require.resolve('postcss-loader'),
-                    options: generateCssConfig(feBrary.themes[index]),
-                  },
-                ],
-              }),
-              // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
-            }
-          );
-        },
-        []
-      ),
       {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
@@ -231,6 +198,68 @@ module.exports = {
               compact: true,
             },
           },
+          // The notation here is somewhat confusing.
+          // "postcss" loader applies autoprefixer to our CSS.
+          // "css" loader resolves paths in CSS and adds assets as dependencies.
+          // "style" loader normally turns CSS into JS modules injecting <style>,
+          // but unlike in development configuration, we do something different.
+          // `ExtractTextPlugin` first applies the "postcss" and "css" loaders
+          // (second argument), then grabs the result CSS and puts it into a
+          // separate file in our build process. This way we actually ship
+          // a single CSS file in production instead of JS code injecting <style>
+          // tags. If you use code splitting, however, any async bundles will still
+          // use the "style" loader inside the async code so CSS from them won't be
+          // in the main CSS file.
+          {
+            test: /legacy\.css$/,
+            loader: ExtractTextPlugin.extract(
+              Object.assign(
+                {
+                  use: [
+                    {
+                      loader: require.resolve('css-loader'),
+                      options: {
+                        importLoaders: 1,
+                        minimize: true,
+                      },
+                    },
+                    {
+                      loader: require.resolve('postcss-loader'),
+                      options: postCSSLoaderOptions,
+                    },
+                  ],
+                },
+                extractTextPluginOptions
+              )
+            ),
+            // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
+          },
+          {
+            test: /\.css$/,
+            loader: ExtractTextPlugin.extract(
+              Object.assign(
+                {
+                  use: [
+                    {
+                      loader: require.resolve('css-loader'),
+                      options: {
+                        minimize: true,
+                        importLoaders: 1,
+                        modules: true,
+                        localIdentName: '_[hash:base64:4]',
+                      },
+                    },
+                    {
+                      loader: require.resolve('postcss-loader'),
+                      options: postCSSLoaderOptions,
+                    },
+                  ],
+                },
+                extractTextPluginOptions
+              )
+            ),
+            // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
+          },
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.
           // This loader doesn't use a "test" so it will catch all modules
@@ -241,7 +270,7 @@ module.exports = {
             // it's runtime that would otherwise processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
-            exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/, /\.css$/],
+            exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
             options: {
               name: 'media/[name].[hash:8].[ext]',
             },
@@ -259,7 +288,9 @@ module.exports = {
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env.stringified),
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
-    ...cssThemeExtracts,
+    new ExtractTextPlugin({
+      filename: cssFilename,
+    }),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical
     // solution that requires the user to opt into importing specific locales.
