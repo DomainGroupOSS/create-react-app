@@ -144,9 +144,9 @@ module.exports = {
         ],
         include: paths.appSrc,
       },
-      ...cssThemeExtracts.map((themeExtractTextPlugin, index) => {
-        return {
-          oneOf: [
+      ...cssThemeExtracts.reduce(
+        (accumulator, themeExtractTextPlugin, index) => {
+          return accumulator.concat(
             // The notation here is somewhat confusing.
             // "postcss" loader applies autoprefixer to our CSS.
             // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -198,10 +198,11 @@ module.exports = {
                 ],
               }),
               // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
-            },
-          ],
-        };
-      }),
+            }
+          );
+        },
+        []
+      ),
       {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
