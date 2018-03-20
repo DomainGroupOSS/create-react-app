@@ -25,7 +25,8 @@ require('../config/env');
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
-const config = require('../config/webpack.config.library');
+const feBrary = require('@domain-group/fe-brary');
+const generateThemedConfig = require('../config/webpack.config.library');
 const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
@@ -94,7 +95,12 @@ measureFileSizesBeforeBuild(paths.appLib)
 function build(previousFileSizes) {
   console.log('Creating an optimized production build...');
 
-  let compiler = webpack(config);
+  // ideally we can have one config and run multiple loaders for the CSS files,
+  // see https://github.com/webpack-contrib/multi-loader/issues/10#issuecomment-374093208 for details
+  let compiler = webpack(
+    feBrary.themes.map(theme => generateThemedConfig(theme))
+  );
+
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
       if (err) {

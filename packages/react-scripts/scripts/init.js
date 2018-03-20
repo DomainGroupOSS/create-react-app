@@ -47,6 +47,10 @@ module.exports = function(
   appPackage.main = 'lib';
   appPackage.style = 'lib';
 
+  // temporary until cssnext upgrade to use my minor version of postcss-apply
+  // here's the PR https://github.com/MoOx/postcss-cssnext/pull/453
+  appPackage.resolutions = { 'postcss-apply': '0.9.0' };
+
   fs.writeFileSync(
     path.join(appPath, 'package.json'),
     JSON.stringify(appPackage, null, 2)
